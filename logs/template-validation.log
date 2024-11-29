@@ -1,0 +1,85 @@
+2024-11-29T14:29:22.688Z - ERROR: Template validation failed
+{
+  "reason": "Invalid category",
+  "categoryId": "non_existent_category"
+}
+
+2024-11-29T14:29:22.689Z - ERROR: Template validation failed
+{
+  "errors": [
+    "Invalid category: non_existent_category"
+  ],
+  "template": {
+    "title": "Invalid Category Template",
+    "description": "This template should fail validation",
+    "category_id": "non_existent_category",
+    "is_default": false,
+    "version": "1.0.0",
+    "content": {
+      "type": "questionnaire",
+      "sections": []
+    }
+  }
+}
+
+2024-11-29T14:29:23.309Z - ERROR: Template validation failed
+{
+  "reason": "Multiple default templates",
+  "categoryId": "questionnaire"
+}
+
+2024-11-29T14:29:23.310Z - ERROR: Template validation failed
+{
+  "errors": [
+    "A default template already exists in category: questionnaire"
+  ],
+  "template": {
+    "title": "First Default Questionnaire",
+    "description": "First default template",
+    "category_id": "questionnaire",
+    "is_default": true,
+    "version": "1.0.0",
+    "content": {
+      "type": "questionnaire",
+      "sections": [
+        {
+          "title": "Default Section",
+          "fields": [
+            {
+              "id": "test_field",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+
+2024-11-29T14:29:23.311Z - ERROR: Category validation error
+{
+  "error": "Cannot read properties of undefined (reading 'indexOf')"
+}
+
+2024-11-29T14:29:23.312Z - ERROR: Template validation failed
+{
+  "reason": "Invalid category"
+}
+
+2024-11-29T14:29:23.312Z - ERROR: Template validation failed
+{
+  "errors": [
+    "Invalid category: undefined",
+    "Missing required field: description",
+    "Missing required field: category_id",
+    "Missing required field: content"
+  ],
+  "template": {
+    "title": "Incomplete Template",
+    "version": "1.0.0"
+  }
+}
+

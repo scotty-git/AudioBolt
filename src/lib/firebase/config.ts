@@ -1,29 +1,49 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
-export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || process.env.VITE_FIREBASE_APP_ID,
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY || '',
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.VITE_FIREBASE_APP_ID || '',
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || ''
 };
 
-// Initialize Firebase only if it hasn't been initialized
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+// Validate configuration
+const validateConfig = (config: typeof firebaseConfig) => {
+  const requiredKeys = [
+    'apiKey', 
+    'authDomain', 
+    'projectId', 
+    'storageBucket', 
+    'messagingSenderId', 
+    'appId'
+  ];
 
-// Initialize services
+  const missingKeys = requiredKeys.filter(key => !config[key]);
+  
+  if (missingKeys.length > 0) {
+    throw new Error(`Missing Firebase configuration: ${missingKeys.join(', ')}`);
+  }
+};
+
+// Validate config before initialization
+validateConfig(firebaseConfig);
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore and Auth
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-// Helper function to check if Firebase is initialized
-export const isFirebaseInitialized = () => {
-  try {
-    return !!app && !!db && !!auth;
-  } catch (error) {
-    console.error('Firebase initialization check failed:', error);
-    return false;
-  }
-};
+export default app;
