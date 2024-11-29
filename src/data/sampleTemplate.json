@@ -1,0 +1,109 @@
+{
+  "templateId": "audiobook-onboarding-001",
+  "version": "1.0.0",
+  "title": "Self-Help Audiobook Preferences Assessment",
+  "description": "Help us understand your self-improvement goals and preferences to recommend the perfect audiobook content for you.",
+  "category": "self-help",
+  "tags": ["personal-development", "motivation", "mindfulness"],
+  "questions": [
+    {
+      "id": "goals",
+      "type": "multipleChoice",
+      "label": "What are your primary self-improvement goals?",
+      "description": "Select all areas you'd like to focus on",
+      "required": true,
+      "options": [
+        {
+          "id": "productivity",
+          "text": "Increase Productivity",
+          "value": "productivity"
+        },
+        {
+          "id": "mindfulness",
+          "text": "Practice Mindfulness",
+          "value": "mindfulness"
+        },
+        {
+          "id": "leadership",
+          "text": "Develop Leadership Skills",
+          "value": "leadership"
+        },
+        {
+          "id": "relationships",
+          "text": "Improve Relationships",
+          "value": "relationships"
+        }
+      ],
+      "followUp": {
+        "condition": {
+          "questionId": "goals",
+          "operator": "equals",
+          "value": "mindfulness"
+        },
+        "questions": [
+          {
+            "id": "meditation-experience",
+            "type": "rating",
+            "label": "How experienced are you with meditation?",
+            "required": true,
+            "validation": {
+              "min": 1,
+              "max": 5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "learning-style",
+      "type": "multipleChoice",
+      "label": "How do you prefer to learn new concepts?",
+      "required": true,
+      "options": [
+        {
+          "id": "practical",
+          "text": "Through practical examples",
+          "value": "practical"
+        },
+        {
+          "id": "theoretical",
+          "text": "Through theoretical explanations",
+          "value": "theoretical"
+        },
+        {
+          "id": "stories",
+          "text": "Through stories and analogies",
+          "value": "stories"
+        }
+      ]
+    },
+    {
+      "id": "daily-time",
+      "type": "slider",
+      "label": "How much time can you dedicate daily to self-improvement?",
+      "required": true,
+      "validation": {
+        "min": 15,
+        "max": 120
+      },
+      "metadata": {
+        "unit": "minutes",
+        "step": 15
+      }
+    },
+    {
+      "id": "current-challenges",
+      "type": "text",
+      "label": "What specific challenges would you like to overcome?",
+      "description": "Your response helps us recommend more relevant content",
+      "required": false
+    }
+  ],
+  "metadata": {
+    "createdAt": "2024-03-14T12:00:00Z",
+    "updatedAt": "2024-03-14T12:00:00Z",
+    "author": "StackBlitz Team",
+    "targetAudience": ["professionals", "students", "entrepreneurs"],
+    "estimatedDuration": 10
+  }
+}
