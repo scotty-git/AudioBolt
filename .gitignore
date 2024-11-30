@@ -22,7 +22,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
 # Editor directories and files
 .vscode/*
@@ -35,5 +34,11 @@ lerna-debug.log*
 *.sln
 *.sw?
 
-# Local Netlify folder
-.netlify
+# Firebase
+firebase
+.firebase/
+*.log
+
+# Large binary files
+*.wasm
+postgis-3.tar.gz
