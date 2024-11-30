@@ -6,6 +6,7 @@ import {
   signIn, 
   signUp, 
   signOut,
+  requestPasswordReset,
   type UserProfile 
 } from '../lib/firebase/auth';
 
@@ -106,6 +107,17 @@ export const useAuth = () => {
     return handleAuthAction(async () => signInAnon());
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    return handleAuthAction(async () => {
+      await requestPasswordReset(email);
+      setState(prev => ({ 
+        ...prev, 
+        error: null,
+        loading: false 
+      }));
+    });
+  }, []);
+
   return {
     user: state.user,
     userProfile: state.userProfile,
@@ -116,5 +128,6 @@ export const useAuth = () => {
     signOut: signOutUser,
     signInAnon: signInAnonUser,
     updateEmail,
+    resetPassword,
   };
 };

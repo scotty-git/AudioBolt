@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for validation
+    function isValidStatus(status) {
+      return status in ['in_progress', 'completed', 'archived'];
+    }
+
+    function isValidTimestamp(timestamp) {
+      return timestamp is timestamp;
+    }
+
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function userExists(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    function templateExists(templateId) {
+      return exists(/databases/$(database)/documents/templates/$(templateId));
+    }
+
+    function isValidResponsesObject(responses) {
+      return responses is map;
+    }
+
+    // Submissions collection rules
+    match /submissions/{submissionId} {
+      // Read rules
+      function canRead() {
+        return isAdmin() || 
+               request.auth.uid == resource.data.userId;
+      }
+
+      // Write rules
+      function canCreate() {
+        return isAdmin() || 
+               request.auth.uid == request.resource.data.userId;
+      }
+
+      function canUpdate() {
+        return isAdmin() || 
+               (request.auth.uid == resource.data.userId && 
+                request.auth.uid == request.resource.data.userId);
+      }
+
+      // Schema validation
+      function validateSubmissionSchema() {
+        let data = request.resource.data;
+        return 
+          // Required fields
+          data.keys().hasAll(['userId', 'templateId', 'responses', 'status', 'createdAt', 'updatedAt']) &&
+          
+          // Field type validation
+          data.userId is string &&
+          data.templateId is string &&
+          isValidResponsesObject(data.responses) &&
+          isValidStatus(data.status) &&
+          isValidTimestamp(data.createdAt) &&
+          isValidTimestamp(data.updatedAt) &&
+          
+          // Optional completedAt validation
+          (!('completedAt' in data) || isValidTimestamp(data.completedAt)) &&
+          
+          // Foreign key validation
+          userExists(data.userId) &&
+          templateExists(data.templateId) &&
+          
+          // Business logic validation
+          (data.status == 'completed' ? ('completedAt' in data) : true);
+      }
+
+      // Timestamp validation for updates
+      function validateTimestamps() {
+        let incomingData = request.resource.data;
+        return 
+          incomingData.createdAt == resource.data.createdAt &&
+          incomingData.updatedAt == request.time;
+      }
+
+      allow read: if canRead();
+      allow create: if canCreate() && validateSubmissionSchema();
+      allow update: if canUpdate() && 
+                      validateSubmissionSchema() && 
+                      validateTimestamps();
+      allow delete: if false;  // Prevent deletions, use archive instead
+    }
+  }
+}

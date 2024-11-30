@@ -5,6 +5,7 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   updateProfile,
+  sendPasswordResetEmail,
   type User,
   type AuthError
 } from 'firebase/auth';
@@ -30,6 +31,9 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   'auth/wrong-password': 'Incorrect password. Please try again.',
   'auth/invalid-credential': 'Invalid login credentials. Please try again.',
   'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+  'auth/requires-recent-login': 'Please log in again to complete this action.',
+  'auth/expired-action-code': 'The password reset link has expired. Please request a new one.',
+  'auth/invalid-action-code': 'The password reset link is invalid. Please request a new one.',
 };
 
 // Helper to get user-friendly error message
@@ -142,4 +146,26 @@ export const observeAuthState = (callback: (user: User | null) => void): (() => 
     }
     callback(user);
   });
+};
+
+/**
+ * Sends a password reset email to the specified email address
+ * @param email The email address to send the password reset link to
+ * @returns A promise that resolves when the email has been sent
+ * @throws AuthError if the email is invalid or no user exists with that email
+ */
+export const requestPasswordReset = async (email: string): Promise<void> => {
+  try {
+    if (isDevelopment) {
+      console.log('[Auth] Development mode: Simulating password reset for', email);
+      return;
+    }
+
+    console.log('[Auth] Sending password reset email to:', email);
+    await sendPasswordResetEmail(auth, email);
+    console.log('[Auth] Password reset email sent successfully');
+  } catch (error) {
+    console.error('[Auth] Password reset error:', error);
+    throw error;
+  }
 };

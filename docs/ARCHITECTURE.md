@@ -1,234 +1,188 @@
-# Application Architecture
-
-## Overview
-
-The application follows a modular architecture with clear separation of concerns, designed to handle authentication, profile management, and template management in a secure and maintainable way.
-
-```
-src/
-├── components/        # Reusable UI components
-│   ├── common/       # Shared components (buttons, inputs, etc.)
-│   ├── auth/         # Authentication components
-│   ├── profile/      # Profile management components
-│   ├── feedback/     # Feedback components (loading, errors)
-│   ├── layout/       # Layout components
-│   └── templates/    # Template-specific components
-├── hooks/            # Custom React hooks
-│   ├── useAuth/      # Authentication hooks
-│   ├── useProfile/   # Profile management hooks
-│   └── useUpload/    # File upload hooks
-├── pages/           # Main application views
-├── lib/            # Core libraries and configurations
-│   ├── firebase/   # Firebase configuration and utilities
-│   └── db/         # Database abstractions
-├── utils/           # Helper functions and utilities
-└── types/           # TypeScript definitions
-```
+# System Architecture
 
 ## Core Components
 
-### Authentication System
-- Firebase Authentication integration
-- Secure token management
-- Session handling
-- Profile management
-- Avatar upload system
+### 1. Submission Management System
+- **Database**: Firestore
+- **Schema**: Strongly typed submission documents with version history
+- **Operations**: CRUD operations with validation and access control
+- **Features**:
+  - Real-time updates
+  - Offline persistence
+  - Version tracking
+  - Status management
+  - Archival system
+  - Bulk operations
+  - Rate limiting
 
-### Firebase Integration
-- Firestore for data persistence
-- Authentication system
-- Storage for avatars
-- Real-time updates
-- Offline capabilities
+### 2. Authentication & Security Layer
+- **Authentication**: Firebase Authentication
+  - Email/Password authentication
+  - Anonymous authentication
+  - Password reset workflow
+  - Session management
+  - Token refresh
+- **Authorization**: Role-based access control
+- **Security Rules**: Comprehensive Firestore rules
+- **Features**:
+  - IP-based rate limiting
+  - Suspicious activity detection
+  - Multi-channel alerts
+  - Automated blocking
+  - Development mode support
 
-### Template Management
-- Unified interface for managing onboarding flows and questionnaires
-- Multi-select functionality for bulk operations
-- Advanced filtering and search capabilities
-- Responsive design with mobile-optimized views
+### 3. Real-time System
+- **Live Updates**:
+  - Real-time submission tracking
+  - Network status monitoring
+  - Offline data synchronization
+- **Persistence**:
+  - IndexedDB storage
+  - Automatic cache management
+  - Cross-tab coordination
+  - Graceful degradation
 
-### Component Architecture
-1. Authentication Components
-   - Login form
-   - Registration form
-   - Password reset
-   - Profile management
-   - Avatar upload
+### 4. Monitoring System
+- **Metrics Collection**:
+  - Usage metrics
+  - Performance metrics
+  - Latency tracking
+  - Error logging
+  - Network status
+- **Alerting**:
+  - Email notifications
+  - Slack integration
+  - Webhook support
+  - Configurable thresholds
 
-2. Template List View
-   - Tabbed navigation
-   - Search and filter functionality
-   - Bulk selection and actions
-   - Responsive table/card layout
+### 5. Admin Operations
+- **Bulk Processing**:
+  - Archive submissions
+  - Update metadata
+  - Status changes
+- **Features**:
+  - Batch processing
+  - Progress tracking
+  - Error handling
+  - Dry run mode
 
-3. Profile Management
-   - Profile updates
-   - Avatar management
-   - Password changes
-   - Preference settings
-   - Account deletion
+## System Design
 
-4. Filter System
-   - Type-based filtering
-   - Status filtering
-   - Date range selection
-   - Search by title
+### Data Flow
+1. **Authentication Flow**:
+   - User authentication (email/password, anonymous)
+   - Token management
+   - Session persistence
+   - Password reset handling
 
-## State Management
+2. **Submission Flow**:
+   - Real-time data synchronization
+   - Offline data handling
+   - Version control
+   - Access control validation
 
-### Authentication State
-```typescript
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-  error: AuthError | null;
-}
+3. **Admin Flow**:
+   - Bulk operations
+   - Monitoring
+   - Alert management
+   - System configuration
 
-interface User {
-  uid: string;
-  email: string;
-  displayName?: string;
-  photoURL?: string;
-  emailVerified: boolean;
-}
-```
+### Technical Stack
+- **Frontend**:
+  - React
+  - TypeScript
+  - Custom Hooks
+  - Real-time Components
 
-### Profile State
-```typescript
-interface UserProfile {
-  uid: string;
-  avatarUrl?: string;
-  preferences: {
-    genres: string[];
-    readingSpeed: 'slow' | 'medium' | 'fast';
-  };
-  settings: {
-    emailNotifications: boolean;
-    theme: 'light' | 'dark' | 'system';
-    language: string;
-  };
-}
-```
+- **Backend Services**:
+  - Firebase Authentication
+  - Firestore Database
+  - Cloud Functions
+  - Security Rules
 
-### Template State
-```typescript
-interface Template {
-  id: string;
-  title: string;
-  type: 'onboarding' | 'questionnaire';
-  content: string;
-  is_default: boolean;
-  status: 'draft' | 'published' | 'archived';
-  created_at: string;
-  updated_at: string;
-  version: string;
-}
-```
+- **Development Tools**:
+  - Vite
+  - ESLint
+  - TypeScript
+  - Firebase Emulators
 
-### Firebase Integration
-```typescript
-interface FirebaseConfig {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-}
-```
+### Security Architecture
+1. **Authentication**:
+   - Secure token management
+   - Session handling
+   - Password policies
+   - Reset workflows
 
-## Component Patterns
+2. **Authorization**:
+   - Role-based access
+   - Resource-level permissions
+   - Action-based controls
 
-### Authentication Components
-- AuthProvider: Context provider for authentication state
-- PrivateRoute: Protected route component
-- LoginForm: Authentication form component
-- ProfileForm: Profile management form
-- AvatarUpload: File upload component
+3. **Data Security**:
+   - Field-level security
+   - Input validation
+   - Output sanitization
+   - Rate limiting
 
-### Shared Components
-- SelectableTable: Reusable table with multi-select
-- MultiSelectActions: Bulk action controls
-- DeleteConfirmationDialog: Reusable confirmation modal
-- FilterDropdown: Advanced filtering interface
+### Error Handling
+1. **Client-side**:
+   - Network errors
+   - Authentication errors
+   - Validation errors
+   - Offline state handling
 
-### Firebase Components
-- FirebaseProvider: Context provider for Firebase
-- FirebaseDebugger: Debugging interface
-- AuthGuard: Authentication wrapper
-- StorageUploader: File upload wrapper
+2. **Server-side**:
+   - Permission errors
+   - Rate limit errors
+   - Database errors
+   - Token errors
 
-### Mobile Optimization
-- Card-based layout for small screens
-- Touch-friendly controls
-- Responsive dropdowns and modals
-- Optimized file uploads
+### Performance Optimization
+1. **Real-time Updates**:
+   - Efficient data synchronization
+   - Selective updates
+   - Network status adaptation
 
-## Security Patterns
+2. **Offline Support**:
+   - IndexedDB persistence
+   - Cache management
+   - Sync resolution
 
-### Authentication
-- Secure token management
-- Session handling
-- Password policies
-- Rate limiting
-- Error masking
-
-### File Upload
-- Type validation
-- Size restrictions
-- Malware scanning
-- Secure URLs
-- Cleanup processes
-
-### Profile Management
-- Input validation
-- Data sanitization
-- Access control
-- Error handling
-- Audit logging
-
-## Performance Optimization
-
-### Authentication
-- Token caching
-- Session persistence
-- Lazy loading
-- Error recovery
-- Memory management
-
-### File Upload
-- Chunk uploading
-- Progress tracking
-- Retry mechanism
-- Cache management
-- Cleanup routines
-
-### State Management
-- Efficient updates
-- Memory cleanup
-- Type safety
-- Error boundaries
-- Loading states
+3. **Resource Management**:
+   - Connection pooling
+   - Cache strategies
+   - Memory optimization
 
 ## Development Guidelines
 
-### Code Organization
-- Feature-based structure
-- Clear separation of concerns
-- Type safety
-- Error handling
-- Documentation
+### Best Practices
+1. **Code Organization**:
+   - Feature-based structure
+   - Clear separation of concerns
+   - Type safety
+   - Documentation
 
-### Security Best Practices
-- Input validation
-- Error masking
-- Access control
-- Secure storage
-- Audit logging
+2. **Error Handling**:
+   - Comprehensive error types
+   - User-friendly messages
+   - Detailed logging
+   - Recovery strategies
 
-### Performance Considerations
-- Lazy loading
-- Code splitting
-- Memory management
-- Cache optimization
-- Error recovery
+3. **Testing**:
+   - Unit tests
+   - Integration tests
+   - Firebase emulator tests
+   - Error scenario coverage
+
+### Deployment Strategy
+1. **Environment Management**:
+   - Development
+   - Staging
+   - Production
+   - Feature flags
+
+2. **Release Process**:
+   - Version control
+   - Change documentation
+   - Rollback procedures
+   - Monitoring setup
