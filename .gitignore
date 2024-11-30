@@ -41,4 +41,42 @@ firebase
 
 # Large binary files
 *.wasm
+*.node
+*.tar.gz
+*.map
 postgis-3.tar.gz
+
+# Build artifacts
+dist/
+build/
+Release/
+*.min.js
+*.min.css
+*.development.js
+
+# Sensitive files
+*serviceAccountKey*.json
+*credentials*.json
+*key*.json
+*.pem
+*.key
+
+# Database files
+*.sqlite
+*.db
+*.data
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
