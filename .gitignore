@@ -38,6 +38,8 @@ pnpm-debug.log*
 firebase
 .firebase/
 *.log
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
 
 # Large binary files
 *.wasm
