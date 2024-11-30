@@ -2,16 +2,21 @@
 
 ## Overview
 
-The application follows a modular architecture with clear separation of concerns, designed to handle both onboarding flows and questionnaires in a flexible, maintainable way.
+The application follows a modular architecture with clear separation of concerns, designed to handle authentication, profile management, and template management in a secure and maintainable way.
 
 ```
 src/
 ├── components/        # Reusable UI components
 │   ├── common/       # Shared components (buttons, inputs, etc.)
+│   ├── auth/         # Authentication components
+│   ├── profile/      # Profile management components
 │   ├── feedback/     # Feedback components (loading, errors)
 │   ├── layout/       # Layout components
 │   └── templates/    # Template-specific components
 ├── hooks/            # Custom React hooks
+│   ├── useAuth/      # Authentication hooks
+│   ├── useProfile/   # Profile management hooks
+│   └── useUpload/    # File upload hooks
 ├── pages/           # Main application views
 ├── lib/            # Core libraries and configurations
 │   ├── firebase/   # Firebase configuration and utilities
@@ -22,9 +27,17 @@ src/
 
 ## Core Components
 
+### Authentication System
+- Firebase Authentication integration
+- Secure token management
+- Session handling
+- Profile management
+- Avatar upload system
+
 ### Firebase Integration
 - Firestore for data persistence
 - Authentication system
+- Storage for avatars
 - Real-time updates
 - Offline capabilities
 
@@ -35,25 +48,67 @@ src/
 - Responsive design with mobile-optimized views
 
 ### Component Architecture
-1. Template List View
+1. Authentication Components
+   - Login form
+   - Registration form
+   - Password reset
+   - Profile management
+   - Avatar upload
+
+2. Template List View
    - Tabbed navigation
    - Search and filter functionality
    - Bulk selection and actions
    - Responsive table/card layout
 
-2. Template Actions
-   - Create new templates
-   - Edit existing templates
-   - Set default templates
-   - Delete templates
+3. Profile Management
+   - Profile updates
+   - Avatar management
+   - Password changes
+   - Preference settings
+   - Account deletion
 
-3. Filter System
+4. Filter System
    - Type-based filtering
    - Status filtering
    - Date range selection
    - Search by title
 
 ## State Management
+
+### Authentication State
+```typescript
+interface AuthState {
+  user: User | null;
+  loading: boolean;
+  error: AuthError | null;
+}
+
+interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  emailVerified: boolean;
+}
+```
+
+### Profile State
+```typescript
+interface UserProfile {
+  uid: string;
+  avatarUrl?: string;
+  preferences: {
+    genres: string[];
+    readingSpeed: 'slow' | 'medium' | 'fast';
+  };
+  settings: {
+    emailNotifications: boolean;
+    theme: 'light' | 'dark' | 'system';
+    language: string;
+  };
+}
+```
 
 ### Template State
 ```typescript
@@ -84,6 +139,13 @@ interface FirebaseConfig {
 
 ## Component Patterns
 
+### Authentication Components
+- AuthProvider: Context provider for authentication state
+- PrivateRoute: Protected route component
+- LoginForm: Authentication form component
+- ProfileForm: Profile management form
+- AvatarUpload: File upload component
+
 ### Shared Components
 - SelectableTable: Reusable table with multi-select
 - MultiSelectActions: Bulk action controls
@@ -94,79 +156,79 @@ interface FirebaseConfig {
 - FirebaseProvider: Context provider for Firebase
 - FirebaseDebugger: Debugging interface
 - AuthGuard: Authentication wrapper
+- StorageUploader: File upload wrapper
 
 ### Mobile Optimization
 - Card-based layout for small screens
 - Touch-friendly controls
 - Responsive dropdowns and modals
-- Optimized spacing and typography
+- Optimized file uploads
 
-## Error Handling
+## Security Patterns
 
-1. Firebase Operations
-   - Connection handling
-   - Transaction rollbacks
-   - Quota management
-   - Fallback mechanisms
+### Authentication
+- Secure token management
+- Session handling
+- Password policies
+- Rate limiting
+- Error masking
 
-2. User Actions
-   - Validation feedback
-   - Confirmation dialogs
-   - Error boundaries
-   - Loading states
+### File Upload
+- Type validation
+- Size restrictions
+- Malware scanning
+- Secure URLs
+- Cleanup processes
 
-## Performance Considerations
+### Profile Management
+- Input validation
+- Data sanitization
+- Access control
+- Error handling
+- Audit logging
 
-1. Data Loading
-   - Efficient Firestore queries
-   - Optimized renders
-   - Lazy loading
-   - Debounced search
+## Performance Optimization
 
-2. UI Optimization
-   - Virtualized lists
-   - Optimized re-renders
-   - Efficient state updates
-   - Responsive images
+### Authentication
+- Token caching
+- Session persistence
+- Lazy loading
+- Error recovery
+- Memory management
 
-## Security Considerations
+### File Upload
+- Chunk uploading
+- Progress tracking
+- Retry mechanism
+- Cache management
+- Cleanup routines
 
-1. Firebase Security
-   - Proper security rules
-   - Authentication checks
-   - Data validation
-   - Access control
+### State Management
+- Efficient updates
+- Memory cleanup
+- Type safety
+- Error boundaries
+- Loading states
 
-2. Error Prevention
-   - Input validation
-   - Confirmation dialogs
-   - Data backups
-   - Version control
+## Development Guidelines
 
-## Testing Strategy
+### Code Organization
+- Feature-based structure
+- Clear separation of concerns
+- Type safety
+- Error handling
+- Documentation
 
-1. Unit Tests
-   - Component testing
-   - Hook testing
-   - Firebase service testing
-   - State management testing
+### Security Best Practices
+- Input validation
+- Error masking
+- Access control
+- Secure storage
+- Audit logging
 
-2. Integration Tests
-   - User flows
-   - Firebase integration
-   - CRUD operations
-   - Mobile responsiveness
-
-## Future Considerations
-
-1. Planned Features
-   - Advanced sorting
-   - Template categories
-   - Batch operations
-   - Template versioning
-
-2. Scalability
-   - Performance optimization
-   - Storage management
-   - Feature modularity
-   - Enhanced customization
+### Performance Considerations
+- Lazy loading
+- Code splitting
+- Memory management
+- Cache optimization
+- Error recovery

@@ -1,77 +1,120 @@
-import { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { observeAuthState, signInAnon, signIn, signUp, signOut } from '../lib/firebase/auth';
+import { useState, useEffect, useCallback } from 'react';
+import { User, updateEmail as firebaseUpdateEmail } from 'firebase/auth';
+import { 
+  observeAuthState, 
+  signInAnon, 
+  signIn, 
+  signUp, 
+  signOut,
+  type UserProfile 
+} from '../lib/firebase/auth';
+
+export type AuthError = {
+  code: string;
+  message: string;
+};
+
+interface AuthContextState {
+  user: User | null;
+  userProfile: UserProfile | null;
+  loading: boolean;
+  error: AuthError | null;
+}
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [state, setState] = useState<AuthContextState>({
+    user: null,
+    userProfile: null,
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
+    let mounted = true;
+    console.log('[useAuth] Setting up auth listener');
+
     const unsubscribe = observeAuthState((user) => {
-      setUser(user);
-      setLoading(false);
+      if (mounted) {
+        setState(prev => ({
+          ...prev,
+          user,
+          loading: false,
+          error: null,
+        }));
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      mounted = false;
+      console.log('[useAuth] Cleaning up auth listener');
+      unsubscribe();
+    };
   }, []);
 
-  const handleError = (error: unknown) => {
-    setError(error instanceof Error ? error : new Error('An unknown error occurred'));
-    setLoading(false);
-  };
+  const handleAuthError = useCallback((error: unknown) => {
+    console.error('[useAuth] Authentication error:', error);
+    const authError: AuthError = {
+      code: error instanceof Error ? error.name : 'unknown',
+      message: error instanceof Error ? error.message : 'An unknown error occurred',
+    };
+    
+    setState(prev => ({
+      ...prev,
+      error: authError,
+      loading: false,
+    }));
+    
+    throw authError;
+  }, []);
 
-  const signInAnonymously = async () => {
+  const handleAuthAction = async <T,>(action: () => Promise<T>): Promise<T> => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      setLoading(true);
-      setError(null);
-      const user = await signInAnon();
-      setUser(user);
+      const result = await action();
+      setState(prev => ({ ...prev, loading: false, error: null }));
+      return result;
     } catch (error) {
-      handleError(error);
+      handleAuthError(error);
+      throw error;
     }
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const user = await signIn(email, password);
-      setUser(user);
-    } catch (error) {
-      handleError(error);
-    }
-  };
+  const updateEmail = useCallback(async (newEmail: string) => {
+    if (!state.user) throw new Error('No user logged in');
+    return handleAuthAction(async () => {
+      await firebaseUpdateEmail(state.user!, newEmail);
+      return state.user!;
+    });
+  }, [state.user]);
 
-  const register = async (email: string, password: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const user = await signUp(email, password);
-      setUser(user);
-    } catch (error) {
-      handleError(error);
-    }
-  };
+  const signInUser = useCallback(async (email: string, password: string) => {
+    return handleAuthAction(async () => signIn(email, password));
+  }, []);
 
-  const logout = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const signUpUser = useCallback(async (email: string, password: string, displayName?: string) => {
+    return handleAuthAction(async () => signUp(email, password, displayName));
+  }, []);
+
+  const signOutUser = useCallback(async () => {
+    return handleAuthAction(async () => {
       await signOut();
-      setUser(null);
-    } catch (error) {
-      handleError(error);
-    }
-  };
+      setState(prev => ({ ...prev, user: null, userProfile: null }));
+    });
+  }, []);
+
+  const signInAnonUser = useCallback(async () => {
+    return handleAuthAction(async () => signInAnon());
+  }, []);
 
   return {
-    user,
-    loading,
-    error,
-    signInAnonymously,
-    login,
-    register,
-    logout
+    user: state.user,
+    userProfile: state.userProfile,
+    loading: state.loading,
+    error: state.error,
+    signIn: signInUser,
+    signUp: signUpUser,
+    signOut: signOutUser,
+    signInAnon: signInAnonUser,
+    updateEmail,
   };
 };

@@ -58,15 +58,16 @@ export const Navigation: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
+
+          {/* Mobile menu */}
+          <MobileMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+            onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            menuItems={menuItems}
+          />
         </div>
       </div>
-
-      {/* Mobile menu */}
-      <MobileMenu
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        menuItems={menuItems}
-      />
     </header>
   );
 };

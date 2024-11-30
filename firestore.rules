@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isValidTimestamp(timestamp) {
+      return timestamp is timestamp && 
+             timestamp.seconds is number && 
+             timestamp.nanos is number;
+    }
+    
+    function hasRequiredFields(data, fields) {
+      return data.keys().hasAll(fields);
+    }
+    
+    function isValidEmail(email) {
+      return email is string && 
+             email.matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
+    }
+    
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || request.auth.token.admin == true);
+      allow create: if isSignedIn() && isOwner(userId) && 
+                      hasRequiredFields(request.resource.data, ['uid', 'createdAt', 'updatedAt']) &&
+                      request.resource.data.uid == userId &&
+                      isValidTimestamp(request.resource.data.createdAt) &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      (!request.resource.data.keys().hasAny(['email']) || isValidEmail(request.resource.data.email));
+      allow update: if isSignedIn() && isOwner(userId) &&
+                      request.resource.data.uid == userId &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      (!request.resource.data.keys().hasAny(['email']) || isValidEmail(request.resource.data.email));
+      allow delete: if false; // Prevent user deletion through client
+    }
+    
+    // User Profiles Collection
+    match /user_profiles/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || request.auth.token.admin == true);
+      allow create: if isSignedIn() && isOwner(userId) &&
+                      hasRequiredFields(request.resource.data, ['uid', 'preferences', 'settings', 'createdAt', 'updatedAt']) &&
+                      request.resource.data.uid == userId &&
+                      isValidTimestamp(request.resource.data.createdAt) &&
+                      isValidTimestamp(request.resource.data.updatedAt);
+      allow update: if isSignedIn() && isOwner(userId) &&
+                      request.resource.data.uid == userId &&
+                      isValidTimestamp(request.resource.data.updatedAt);
+      allow delete: if false; // Prevent profile deletion through client
+    }
+    
+    // Templates Collection
+    match /templates/{templateId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only allow admin to modify templates through backend
+    }
+    
+    // Onboarding Submissions Collection
+    match /onboarding_submissions/{submissionId} {
+      allow read: if isSignedIn() && (
+                    request.auth.uid == resource.data.uid || 
+                    request.auth.token.admin == true
+                 );
+      allow create: if isSignedIn() &&
+                      hasRequiredFields(request.resource.data, ['uid', 'answers', 'completed', 'createdAt', 'updatedAt']) &&
+                      request.resource.data.uid == request.auth.uid &&
+                      isValidTimestamp(request.resource.data.createdAt) &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      request.resource.data.answers is map;
+      allow update: if isSignedIn() &&
+                      request.auth.uid == resource.data.uid &&
+                      request.resource.data.uid == request.auth.uid &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      request.resource.data.answers is map;
+      allow delete: if false; // Prevent submission deletion through client
+    }
+    
+    // Questionnaire Submissions Collection
+    match /questionnaire_submissions/{submissionId} {
+      allow read: if isSignedIn() && (
+                    request.auth.uid == resource.data.uid || 
+                    request.auth.token.admin == true
+                 );
+      allow create: if isSignedIn() &&
+                      hasRequiredFields(request.resource.data, [
+                        'uid', 
+                        'questionnaireId', 
+                        'answers', 
+                        'completed', 
+                        'createdAt', 
+                        'updatedAt'
+                      ]) &&
+                      request.resource.data.uid == request.auth.uid &&
+                      isValidTimestamp(request.resource.data.createdAt) &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      request.resource.data.answers is map;
+      allow update: if isSignedIn() &&
+                      request.auth.uid == resource.data.uid &&
+                      request.resource.data.uid == request.auth.uid &&
+                      isValidTimestamp(request.resource.data.updatedAt) &&
+                      request.resource.data.answers is map;
+      allow delete: if false; // Prevent submission deletion through client
+    }
+  }
+}

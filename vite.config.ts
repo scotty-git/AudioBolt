@@ -1,10 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    include: ['lucide-react'],
+    exclude: []
+  },
+  resolve: {
+    alias: [
+      {
+        find: 'lucide-react',
+        replacement: path.resolve(__dirname, 'node_modules/lucide-react')
+      }
+    ]
   },
   server: {
     open: false,

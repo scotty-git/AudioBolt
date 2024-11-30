@@ -4,6 +4,14 @@ A comprehensive React application for managing onboarding flows and questionnair
 
 ## Features
 
+### Authentication System
+- Secure email/password authentication
+- Profile management with avatars
+- Password change functionality
+- Profile deletion option
+- Session management
+- Security-first design
+
 ### Template Management
 - Create and manage templates
 - Multi-select and bulk operations

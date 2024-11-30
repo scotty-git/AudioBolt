@@ -1,6 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Headphones, PencilRuler, Users, ClipboardList } from 'lucide-react';
+import { 
+  Headphones,
+  PencilRuler,
+  Users,
+  ClipboardList
+} from 'lucide-react';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();

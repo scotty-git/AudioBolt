@@ -5,9 +5,41 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Audiobook Questionnaire Builder</title>
+    <script>
+      // EARLIEST POSSIBLE LOGGING
+      console.log('🚀 HTML SCRIPT: Page is loading');
+      window.addEventListener('load', () => {
+        console.log('🚀 HTML SCRIPT: Page fully loaded');
+      });
+      
+      // CRITICAL LOGGING
+      console.error('🚨 HTML INIT: Page loading CRITICAL');
+      window.addEventListener('DOMContentLoaded', () => {
+        console.error('🚨 HTML INIT: DOM Content Loaded CRITICAL');
+      });
+      window.addEventListener('load', () => {
+        console.error('🚨 HTML INIT: Full Page Loaded CRITICAL');
+      });
+      
+      // Catch and log any errors
+      window.addEventListener('error', (event) => {
+        console.error('🚨 GLOBAL ERROR CRITICAL:', {
+          message: event.message,
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno,
+          error: event.error
+        });
+      });
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="text-align: center; padding: 20px; background-color: #f0f0f0;">
+        <h1>Loading AudioBolt...</h1>
+        <p>If you see this message for more than a few seconds, there might be an initialization problem.</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
