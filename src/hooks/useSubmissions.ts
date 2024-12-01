@@ -1,26 +1,52 @@
 import { useCallback } from 'react';
-import { useAuthContext } from '../components/auth/AuthProvider';
-import { handleOnboardingSubmit, handleQuestionnaireSubmit } from '../lib/firebase/handlers';
-import type { OnboardingData, QuestionnaireData } from '../lib/firebase/handlers/submissions';
+import { submissionRepository, SubmissionData } from '../db/repositories/submissions';
+
+export interface OnboardingData {
+  templateId: string;
+  answers: Record<string, string | string[]>;
+  metadata: {
+    templateTitle: string;
+    completedSections: string[];
+    currentSectionIndex: number;
+    content: string;
+  };
+}
+
+export interface QuestionnaireData {
+  templateId: string;
+  answers: Record<string, string | string[]>;
+  metadata: {
+    templateTitle: string;
+    completedSections: string[];
+    currentSectionIndex: number;
+    content: string;
+  };
+}
 
 export const useSubmissions = () => {
-  const { user } = useAuthContext();
+  const submitOnboarding = useCallback(async (data: OnboardingData): Promise<void> => {
+    const submission: SubmissionData = {
+      type: 'onboarding',
+      userId: 'anonymous',
+      userEmail: 'anonymous@example.com',
+      templateId: data.templateId,
+      answers: data.answers,
+      metadata: data.metadata
+    };
+    return submissionRepository.create(submission);
+  }, []);
 
-  const submitOnboarding = useCallback(async (data: OnboardingData) => {
-    if (!user?.email) {
-      throw new Error('User must be authenticated to submit onboarding');
-    }
-
-    return handleOnboardingSubmit(user.uid, user.email, data);
-  }, [user]);
-
-  const submitQuestionnaire = useCallback(async (data: QuestionnaireData) => {
-    if (!user?.email) {
-      throw new Error('User must be authenticated to submit questionnaire');
-    }
-
-    return handleQuestionnaireSubmit(user.uid, user.email, data);
-  }, [user]);
+  const submitQuestionnaire = useCallback(async (data: QuestionnaireData): Promise<void> => {
+    const submission: SubmissionData = {
+      type: 'questionnaire',
+      userId: 'anonymous',
+      userEmail: 'anonymous@example.com',
+      templateId: data.templateId,
+      answers: data.answers,
+      metadata: data.metadata
+    };
+    return submissionRepository.create(submission);
+  }, []);
 
   return {
     submitOnboarding,

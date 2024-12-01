@@ -1,46 +1,41 @@
 # Template Management System
 
-A comprehensive React application for managing onboarding flows and questionnaires. Built with React, TypeScript, Firebase, and Tailwind CSS.
+A client-side React application for managing onboarding flows and questionnaires. Built with React, TypeScript, and IndexedDB for local storage.
 
-## Features
+## Current Features
 
 ### Template Management
-- Create and manage templates
-- Multi-select and bulk operations
-- Advanced filtering and search
-- Default template management
-- Mobile-responsive interface
+- Create and manage onboarding flows and questionnaires
+- Draft, publish, and archive templates
+- Version tracking
+- Default template support
+- JSON-based template structure
 
-### Firebase Integration
-- Real-time data synchronization
-- Offline support
-- Authentication system
-- Security rules
-- Performance monitoring
+### Client-Side Storage
+- IndexedDB for persistent browser storage
+- Structured data schema
+- Repository pattern implementation
+- Offline-first architecture
 
 ### Core Functionality
 - Template CRUD operations
+- Response tracking
+- Builder interface for template creation
+- User interface for completing questionnaires
 - Status management (draft/published/archived)
-- Bulk actions (delete, status update)
-- Search and advanced filtering
-- Mobile-optimized views
 
 ### User Interface
-- Clean, modern design
-- Responsive layout
-- Touch-friendly controls
-- Intuitive navigation
-- Real-time feedback
+- React-based modern UI
+- Tailwind CSS styling
+- Responsive design
+- Error boundary protection
+- Debug interface
 
 ## Quick Start
 
 ```bash
 # Install dependencies
 npm install
-
-# Set up Firebase configuration
-cp .env.example .env
-# Add your Firebase configuration to .env
 
 # Start development server
 npm run dev
@@ -56,53 +51,45 @@ npm run build
 
 ```
 src/
-├── components/        # Reusable UI components
-├── hooks/            # Custom React hooks
-├── pages/            # Main application views
-├── lib/             # Core libraries
-├── utils/           # Helper functions
-└── types/           # TypeScript definitions
+├── components/     # Reusable UI components
+├── db/            # IndexedDB setup and repositories
+├── hooks/         # Custom React hooks
+├── pages/         # Main application views
+├── schemas/       # Zod validation schemas
+├── types/         # TypeScript definitions
+└── utils/         # Helper functions
 ```
 
 ## Technology Stack
 
 ### Core
 - React 18
-- TypeScript 5
-- Firebase 10
-- Tailwind CSS 3
-- Vite 5
-
-### Firebase Services
-- Firestore
-- Authentication
-- Performance Monitoring
-- Security Rules
+- TypeScript
+- Vite
+- IndexedDB (via idb package)
+- Tailwind CSS
 
 ### State Management
 - React hooks
 - Context API
-- Custom hooks
-- Firebase real-time updates
+- IndexedDB for persistence
 
-### UI Components
-- Tailwind CSS
-- Lucide icons
-- Custom components
-- Responsive design
+### Data Validation
+- Zod schemas
+- TypeScript types
+- Repository pattern
+
+### Testing
+- Vitest
+- React Testing Library
+- Happy DOM
+- Fake IndexedDB for testing
 
 ## Development
 
 ### Prerequisites
-- Node.js 18+
-- npm 8+
-- Firebase project
-
-### Firebase Setup
-1. Create a Firebase project
-2. Enable Firestore and Authentication
-3. Copy configuration to .env
-4. Set up security rules
+- Node.js
+- npm
 
 ### Available Scripts
 
@@ -114,39 +101,34 @@ npm run preview    # Preview production build
 
 # Testing
 npm test           # Run tests
-npm run test:ui    # Run tests with UI
-npm run coverage   # Generate coverage report
-
-# Firebase
-npm run firebase:emulators  # Start Firebase emulators
-npm run firebase:deploy    # Deploy to Firebase
+npm run test:watch # Watch mode
+npm run test:ui    # Test with UI
+npm run test:coverage # Generate coverage
 
 # Code Quality
 npm run lint       # Run ESLint
 npm run type-check # Run TypeScript checks
 npm run format     # Format code
+
+# Database
+npm run db:setup   # Set up IndexedDB
+npm run cleanup    # Clean database
 ```
 
 ### Testing
 - Unit tests for components
-- Integration tests for flows
-- Firebase service tests
+- Integration tests
+- Repository tests
 - Hook testing
-- Utility function tests
-
-### Debugging
-- Firebase Debug View (`/debug`)
-- Performance monitoring
-- Error tracking
-- Real-time data viewer
+- Schema validation tests
 
 ### Best Practices
 - TypeScript for type safety
 - Component composition
 - Custom hooks for logic
 - Responsive design
-- Accessibility
-- Error handling
+- Error boundaries
+- Schema validation
 
 ## Contributing
 
@@ -162,7 +144,3 @@ npm run format     # Format code
 - Update documentation
 - Follow existing code style
 - Use meaningful commit messages
-
-## License
-
-MIT License - See [LICENSE](LICENSE) for details
